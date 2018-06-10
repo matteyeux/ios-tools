@@ -30,6 +30,7 @@ done
 ```
 ### scrapkeys.py
 Python script used to grab iOS Firmware keys on https://www.theiphonewiki.com
+![demo](screen.png)
 
 `usage: ./scrap.py -c [codename] -d [device] -i [version]`
 
