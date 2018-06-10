@@ -3,7 +3,7 @@ Python scripts for iOS stuff
 
 ### signed.py
 Check for signing status
-Based on [iNeal](https://api.ineal.me/tss/docs) and [IPSW.me](https://ipsw.me/api/ios/docs/2.1/Firmware) APIs
+Based on [IPSW.me](https://ipsw.me/) API
 
 `usage: ./signed.py <device>`
 

@@ -5,7 +5,8 @@ import json
 import pprint
 
 def list_signed(device):
-	json_file = urlopen("https://api.ineal.me/tss/all/all")
+	url = "https://api.ipsw.me/v4/device/" + device
+	json_file = urlopen(url)
 	with open("signed.json",'wb') as output:
 		output.write(json_file.read())
 
@@ -13,9 +14,9 @@ def list_signed(device):
 	i = 0
 	with open("signed.json"):
 		print("signed firmwares for %s:" % device)
-		for i in range(0, len(data[device]["firmwares"])):
-			if data[device]["firmwares"][i]["signing"] == True :
-				print("%s - %s" % (data[device]["firmwares"][i]["version"], data[device]["firmwares"][i]["build"]))
+		for i in range(0, len(data["firmwares"])):
+			if data["firmwares"][i]["signed"] == True :
+				print("%s - %s" % (data["firmwares"][i]["version"], data["firmwares"][i]["buildid"]))
 			i+=1
 
 def usage(tool):
