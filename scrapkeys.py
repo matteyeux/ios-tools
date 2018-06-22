@@ -34,7 +34,6 @@ def parse_iphonewiki(url2parse):
 		for hit in soup.findAll(attrs={'id' : keypage[i]}):
 			bl = keypage[i]
 			print(bl[8:] + ":\n\t" + colors.GREEN + hit.text + colors.ENDG)
-			# print(hit.text)
 
 # Used to 'convert' version -> build ID
 # I just parse firmwares.json on api.ipsw.me
@@ -51,28 +50,52 @@ def version2build(model, version):
 		while ios_version != version :
 			ios_version = data["devices"][model]["firmwares"][i]["version"]
 			buildid = data["devices"][model]["firmwares"][i]["buildid"]
-			# print(ios_version)
-			# print(buildid)
 			i += 1
 	os.remove("firmwares.json")
 	return buildid
 
-# python scrap.py -c Dubois -i 10.2.1 -d iPad4,7
+# we need to get the codename of the firmware to access the URL
+def get_codename(device, version, build):
+	version = version.split('.')[0] + ".x"
+	url = "https://www.theiphonewiki.com/wiki/Firmware_Keys/" + version
+
+	br = mechanize.Browser()
+	br.set_handle_robots(False)
+	html = br.open(url).read()
+	soup = BeautifulSoup(html, 'html.parser')
+
+	i = 0
+	checker = False
+	data = soup.findAll('a')
+	device = "(%s)" % device
+
+	for hit in data:
+
+		# some beta may have the same codename, first in first out
+		if checker is False:
+			try:
+				if data[i].get('href').split('_')[1] == build and data[i].get('href').split('_')[2] == device:
+					checker = True
+					codename = data[i].get('href').split('/')[2].split('_')[0]
+					return codename
+			except:
+				pass
+		i += 1
+
 def usage(toolname):
-	print("usage: " + toolname + " -c [codename] -d [device] -i [version]")
+	print("usage: " + toolname + " -d [device] -i [version]")
 
 if __name__ == '__main__':
 	argc = len(sys.argv)
 	argv = sys.argv
 	check = 0
-	if argc != 7:
+
+	if argc != 5:
 		usage(argv[0])
 		sys.exit(-1)
 
 	for i in range(0,argc):
-		if argv[i] == "-c":
-			codename = argv[i + 1]
-		elif argv[i] == "-i":
+		if argv[i] == "-i":
 			ios_v = argv[i + 1]
 			check = 1
 		elif argv[i] == "-b" :
@@ -82,7 +105,10 @@ if __name__ == '__main__':
 
 	if check == 1: 
 		build = version2build(device, ios_v)
+
 	print("[+] build ID : " + build)
+
+	codename = get_codename(device, ios_v, build)
 
 	url = "https://www.theiphonewiki.com/wiki/" + codename + "_" + build +  "_" + "(" + device + ")"
 	print("[+] grabbing keys from " + url)
