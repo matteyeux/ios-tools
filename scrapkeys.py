@@ -38,20 +38,20 @@ def parse_iphonewiki(url2parse):
 # Used to 'convert' version -> build ID
 # I just parse firmwares.json on api.ipsw.me
 def version2build(model, version):
-	json_file = urllib2.urlopen("https://api.ipsw.me/v2.1/firmwares.json")
-	with open("firmwares.json",'wb') as output:
+	json_file = urllib2.urlopen("https://api.ipsw.me/v4/device/" + model)
+	with open(model, 'wb') as output:
 		output.write(json_file.read())
 
-	data = json.load(open("firmwares.json"))
+	data = json.load(open(model))
 
 	i = 0
-	ios_version = data["devices"][model]["firmwares"][i]["version"]
-	with open("firmwares.json"):
+	ios_version = data["firmwares"][i]["version"]
+	with open(model):
 		while ios_version != version :
-			ios_version = data["devices"][model]["firmwares"][i]["version"]
-			buildid = data["devices"][model]["firmwares"][i]["buildid"]
+			ios_version = data["firmwares"][i]["version"]
+			buildid = data["firmwares"][i]["buildid"]
 			i += 1
-	os.remove("firmwares.json")
+	os.remove(model)
 	return buildid
 
 # we need to get the codename of the firmware to access the URL
@@ -109,7 +109,6 @@ if __name__ == '__main__':
 	print("[+] build ID : " + build)
 
 	codename = get_codename(device, ios_v, build)
-
 	url = "https://www.theiphonewiki.com/wiki/" + codename + "_" + build +  "_" + "(" + device + ")"
 	print("[+] grabbing keys from " + url)
 	parse_iphonewiki(url)
