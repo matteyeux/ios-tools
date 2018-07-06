@@ -83,14 +83,19 @@ def get_codename(device, version, build):
 		i += 1
 
 def usage(toolname):
-	print("usage: " + toolname + " -d [device] -i [version]")
+	print("usage: " + toolname + " [args]")
+	print(" -d <device>")
+	print(" -i <version>")
+	print(" -b <build ID>")
+	print(" -c <codename>")
 
 if __name__ == '__main__':
 	argc = len(sys.argv)
 	argv = sys.argv
 	check = 0
+	codename = None
 
-	if argc != 5:
+	if argc <= 5:
 		usage(argv[0])
 		sys.exit(-1)
 
@@ -102,13 +107,17 @@ if __name__ == '__main__':
 			build = argv[i + 1]
 		elif argv[i] == "-d" :
 			device = argv[i + 1]
+		elif argv[i] == "-c":
+			codename = argv[i + 1]
 
 	if check == 1: 
 		build = version2build(device, ios_v)
 
 	print("[+] build ID : " + build)
 
-	codename = get_codename(device, ios_v, build)
+	if codename == None:
+		codename = get_codename(device, ios_v, build)
+
 	url = "https://www.theiphonewiki.com/wiki/" + codename + "_" + build +  "_" + "(" + device + ")"
 	print("[+] grabbing keys from " + url)
 	parse_iphonewiki(url)
