@@ -1,12 +1,12 @@
 #!/usr/bin/python
 import sys
-from urllib.request import urlopen
+import urllib2
 import json
 import pprint
 
 def list_signed(device):
 	url = "https://api.ipsw.me/v4/device/" + device
-	json_file = urlopen(url)
+	json_file = urllib2.urlopen(url)
 	with open("signed.json",'wb') as output:
 		output.write(json_file.read())
 
