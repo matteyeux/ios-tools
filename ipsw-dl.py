@@ -2,7 +2,7 @@
 import sys
 import requests
 import json
-from urllib.request import urlopen
+import urllib2
 from clint.textui import progress
 
 # extract IPSW filename from URL
@@ -16,7 +16,7 @@ def get_filename(url):
 def dl(url, filename, sizeofile):
 	# idk the size of the file
 	if sizeofile == 0:
-		dl_file = urlopen(url)
+		dl_file = urllib2.urlopen(url)
 		with open(filename,'wb') as output:
 			output.write(dl_file.read())
 
