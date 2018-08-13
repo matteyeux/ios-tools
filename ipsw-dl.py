@@ -44,12 +44,12 @@ def parse_json(model, version):
 	
 	else :
 		data = json.load(open(json_file))
-		i = 0
+		i = -1
 		ios_version = data["firmwares"][i]["version"]
 		with open(json_file):
 			while ios_version != version :
-				ios_version = data["firmwares"][i]["version"]
 				i += 1
+				ios_version = data["firmwares"][i]["version"]
 			buildid = data["firmwares"][i]["buildid"]
 			url = data["firmwares"][i]["url"]
 			size = data["firmwares"][i]["filesize"]
