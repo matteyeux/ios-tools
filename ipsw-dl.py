@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+import os
 import requests
 import json
 import urllib2
@@ -61,6 +62,7 @@ def parse_json(model, version):
 	print("[+] size : %s" % size)
 	
 	dl(url, ipswfile, size)
+	os.remove(json_file)
 
 def usage(toolname):
 	print("usage: %s <model> [version]" % toolname)
