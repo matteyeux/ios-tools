@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+import os
 import urllib2
 import json
 import pprint
@@ -18,6 +19,7 @@ def list_signed(device):
 			if data["firmwares"][i]["signed"] == True :
 				print("%s - %s" % (data["firmwares"][i]["version"], data["firmwares"][i]["buildid"]))
 			i+=1
+	os.remove("signed.json")
 
 def usage(tool):
 	print("usage: %s <device>" % tool)
