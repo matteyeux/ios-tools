@@ -119,7 +119,7 @@ if __name__ == '__main__':
 	ios_v = None
 	set_ios_version = None
 
-	if argc <= 5:
+	if argc <= 4:
 		usage(argv[0])
 		sys.exit(-1)
 
