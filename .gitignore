@@ -3,3 +3,4 @@
 *.IMG3
 *.release.*
 *.dec
+*.pyc
