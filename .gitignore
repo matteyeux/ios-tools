@@ -1,2 +1,5 @@
 *.json
 *.ipsw
+*.IMG3
+*.release.*
+*.dec

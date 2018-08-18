@@ -10,49 +10,71 @@ class colors :
 	GREEN = '\033[92m'
 	ENDG = '\033[0m'
 
-def parse_iphonewiki(url2parse):
+def parse_iphonewiki(url2parse, img_type):
 	br = mechanize.Browser()
 	br.set_handle_robots(False)
 	html = br.open(url2parse).read()
 	soup = BeautifulSoup(html, 'html.parser')
 
 	keypage = list()
-	keypage = ["keypage-rootfs-key", "keypage-updateramdisk-iv", "keypage-updateramdisk-key", 
-		"keypage-restoreramdisk-iv", "keypage-restoreramdisk-key", "keypage-applelogo-iv", 
-		"keypage-applelogo-key", "keypage-batterycharging0-iv", "keypage-batterycharging0-key",
-		"keypage-batterycharging1-iv", "keypage-batterycharging1-key", "keypage-batteryfull-iv",
-		"keypage-batteryfull-key", "keypage-batterylow0-iv", "keypage-batterylow0-key",
-		"keypage-batterylow1-iv", "keypage-batterylow1-key", "keypage-devicetree-iv",
-		"keypage-devicetree-key", "keypage-glyphplugin-iv", "keypage-glyphplugin-key",
-		"keypage-ibec-iv", "keypage-ibec-key", "keypage-iboot-iv", "keypage-iboot-key",
-		"keypage-ibss-iv", "keypage-ibss-key", "keypage-kernelcache-iv",
-		"keypage-kernelcache-key", "keypage-llb-iv", "keypage-llb-key",
-		"keypage-recoverymode-iv", "keypage-recoverymode-key",
-		"keypage-sepfirmware-iv", "keypage-sepfirmware-key"]
-	
-	for i in range(0, len(keypage)) :
-		for hit in soup.findAll(attrs={'id' : keypage[i]}):
-			bl = keypage[i]
-			print(bl[8:] + ":\n\t" + colors.GREEN + hit.text + colors.ENDG)
-
-# Used to 'convert' version -> build ID
+	keypage =   ["rootfs-key", "updateramdisk-iv", "updateramdisk-key",
+				"restoreramdisk-iv", "restoreramdisk-key", "applelogo-iv",
+				"applelogo-key", "batterycharging0-iv", "batterycharging0-key",
+				"batterycharging1-iv", "batterycharging1-key", "batteryfull-iv",
+				"batteryfull-key", "batterylow0-iv", "batterylow0-key",
+				"batterylow1-iv", "batterylow1-key", "devicetree-iv",
+				"devicetree-key", "glyphcharging-iv", "glyphcharging-key",
+				"glyphplugin-iv", "glyphplugin-key",
+				"ibec-iv", "ibec-key", "iboot-iv", "iboot-key",
+				"ibss-iv", "ibss-key", "kernelcache-iv",
+				"kernelcache-key", "llb-iv", "llb-key",
+				"recoverymode-iv", "recoverymode-key",
+				"sepfirmware-iv", "sepfirmware-key"]
+	j = 0
+	key = ""
+	for i in range(0, len(keypage)):
+		for hit in soup.findAll(attrs={'id': "keypage-" + keypage[i]}):
+			if img_type == None:
+				bl = keypage[i]
+				print(bl + ":\n\t %s" % hit.text)
+			elif img_type != None and img_type == keypage[i].split('-')[0]:
+				j += 1
+				key += hit.text
+				if j == 2:
+					return key
+# Used to 'convert' version -> build ID and vice versa
 # I just parse firmwares.json on api.ipsw.me
-def version2build(model, version):
+def version_or_build(model, version, build):
+	get_buildid = False
+	get_version = False
 	json_file = urllib2.urlopen("https://api.ipsw.me/v4/device/" + model)
 	with open(model, 'wb') as output:
 		output.write(json_file.read())
 
 	data = json.load(open(model))
 
+	if build is None:
+		get_buildid = True
+	elif version is None:
+		get_version = True
 	i = 0
-	ios_version = data["firmwares"][i]["version"]
+
 	with open(model):
-		while ios_version != version :
-			ios_version = data["firmwares"][i]["version"]
-			buildid = data["firmwares"][i]["buildid"]
+		while True:
+			if get_buildid is True:
+				result = data["firmwares"][i]["buildid"]
+				ios_version = data["firmwares"][i]["version"]
+				if ios_version == version:
+					break
+
+			elif get_version is True:
+				buildid = data["firmwares"][i]["buildid"]
+				result= data["firmwares"][i]["version"]
+				if build == buildid:
+					break
 			i += 1
 	os.remove(model)
-	return buildid
+	return result
 
 # we need to get the codename of the firmware to access the URL
 def get_codename(device, version, build):
@@ -94,6 +116,8 @@ if __name__ == '__main__':
 	argv = sys.argv
 	check = 0
 	codename = None
+	ios_v = None
+	set_ios_version = None
 
 	if argc <= 5:
 		usage(argv[0])
@@ -102,7 +126,7 @@ if __name__ == '__main__':
 	for i in range(0,argc):
 		if argv[i] == "-i":
 			ios_v = argv[i + 1]
-			check = 1
+			set_ios_version = True
 		elif argv[i] == "-b" :
 			build = argv[i + 1]
 		elif argv[i] == "-d" :
@@ -110,14 +134,19 @@ if __name__ == '__main__':
 		elif argv[i] == "-c":
 			codename = argv[i + 1]
 
-	if check == 1: 
+	if set_ios_version is True:
 		build = version2build(device, ios_v)
+	else:
+		ios_v = version_or_build(device, ios_v, build)
+
+	if codename is None:
+		codename = get_codename(device, ios_v, build)
 
 	print("[+] build ID : " + build)
 
-	if codename == None:
+	if codename is None:
 		codename = get_codename(device, ios_v, build)
 
 	url = "https://www.theiphonewiki.com/wiki/" + codename + "_" + build +  "_" + "(" + device + ")"
 	print("[+] grabbing keys from " + url)
-	parse_iphonewiki(url)
+	parse_iphonewiki(url, None)
