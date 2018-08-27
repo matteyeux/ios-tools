@@ -117,6 +117,7 @@ if __name__ == '__main__':
 	check = 0
 	codename = None
 	ios_v = None
+	build = None
 	set_ios_version = None
 
 	if argc <= 4:
@@ -135,7 +136,7 @@ if __name__ == '__main__':
 			codename = argv[i + 1]
 
 	if set_ios_version is True:
-		build = version2build(device, ios_v)
+		build = version_or_build(device, ios_v, build)
 	else:
 		ios_v = version_or_build(device, ios_v, build)
 
