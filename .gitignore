@@ -1,6 +1,8 @@
 *.json
 *.ipsw
-*.IMG3
+*.img3
+*.im4p
 *.release.*
 *.dec
 *.pyc
+test
