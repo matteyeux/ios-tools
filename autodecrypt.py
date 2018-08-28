@@ -1,39 +1,40 @@
 #!/usr/bin/python
 import sys
+import os
 sys.path.insert(0, ".")
-import decrypt_img3
+import decrypt_img
 import scrapkeys
 
 # boring part of the code.
 # TODO : find a better way
 def get_image_type_name(image):
-	if image == "ogol":
+	if image == "ogol" or image == "logo":
 		img_type = "applelogo"
-	elif image == "0ghc":
+	elif image == "0ghc" or image == "chg0":
 		img_type = "batterycharging0"
-	elif image == "1ghc" :
+	elif image == "1ghc" or image ==  "chg1":
 		img_type = "batterycharging1"
-	elif image == "Ftab":
+	elif image == "Ftab" or image == "batF":
 		img_type = "batteryfull"
-	elif image == "0tab":
+	elif image == "0tab" or image == "bat0":
 		img_type = "batterylow0"
-	elif image == "1tab":
+	elif image == "1tab" or image == "bat1":
 		img_type = "batterylow1"
-	elif image == "ertd":
+	elif image == "ertd" or image == "dtre":
 		img_type = "devicetree"
-	elif image == "Cylg":
+	elif image == "Cylg" or image == "glyC":
 		img_type = "glyphcharging"
-	elif image == "Pylg":
-		img_type = "glyphcharging"
-	elif image == "tobi":
+	elif image == "Pylg" or image == "glyP":
+		img_type = "glyphplugin"
+	elif image == "tobi" or image == "ibot":
 		img_type = "iboot"
-	elif image == "blli":
+	elif image == "blli" or image == "illb":
 		img_type = "llb"
-	elif image == "ssbi":
+	elif image == "ssbi" or image == "ibss":
 		img_type = "ibss"
-	elif image == "cebi":
+	elif image == "cebi" or image == "ibec":
 		img_type = "ibec"
-	elif image == "lnrk":
+	elif image == "lnrk" or image == "krnl" :
 		img_type = "kernelcache"
 	else :
 		print("image type not supported : %s" % image)
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 
 	url = "https://www.theiphonewiki.com/wiki/" + codename + "_" + build + "_" + "(" + device + ")"
 
-	image_type = decrypt_img3.get_image_type(file)
+	magic, image_type = decrypt_img.get_image_type(file)
 	image_name = get_image_type_name(image_type)
 
 	print("[x] image : %s" % image_name)
@@ -94,5 +95,7 @@ if __name__ == '__main__':
 	image_keys = scrapkeys.parse_iphonewiki(url, image_name)
 	iv = image_keys[:32]
 	key = image_keys[-64:]
-	decrypt_img3.decrypt_img3(file, file + ".dec", key, iv, openssl='openssl')
+	print("[+] iv : %s" % iv)
+	print("[+] key : %s" % key)
+	decrypt_img.decrypt_img(file, file + ".dec", magic, key, iv, openssl='openssl')
 	print("[x] done")
