@@ -1,9 +1,11 @@
 #!/usr/bin/python
 import sys
 import os
+import shutil
 import requests
 import json
 import urllib2
+import zipfile
 from clint.textui import progress
 
 # extract IPSW filename from URL
@@ -60,12 +62,23 @@ def parse_json(model, version):
 	print("[+] IPSW : %s" % ipswfile)
 	print("[+] URL : %s" % url)
 	print("[+] size : %s" % size)
-	
-	dl(url, ipswfile, size)
 	os.remove(json_file)
+	return url, ipswfile, size
+
+def recursive_rm(folder="ipsw"):
+
+	for files in os.listdir(folder):
+		file_path = os.path.join(folder, files)
+		try:
+			if os.path.isfile(file_path):
+				os.unlink(file_path)
+			elif os.path.isdir(file_path): shutil.rmtree(file_path)
+		except Exception as error:
+			print(error)
 
 def usage(toolname):
-	print("usage: %s <model> [version]" % toolname)
+	# -u stands for unzip, it will decompress firmware to IPSW folder
+	print("usage: %s <model> <version> [-u]" % toolname)
 
 if __name__ == '__main__':
 	argv = sys.argv
@@ -79,8 +92,29 @@ if __name__ == '__main__':
 	elif argc == 3:
 		device = argv[1]
 		version = argv[2]
+	elif argc == 4:
+		device = argv[1]
+		version = argv[2]
+		if argv[3] == "-u":
+			decompress = True
+		else :
+			usage(argv[0])
+			sys.exit(-1)
 	else :
 		usage(argv[0])
 		sys.exit(-1)
 
-	parse_json(device, version)
+	url, ipsw, size_of_ipsw = parse_json(device, version)
+	dl(url, ipsw, size_of_ipsw)
+
+	if decompress is True:
+		dest = "ipsw"
+		if os.path.isdir(dest):
+			recursive_rm(dest)
+		else :
+			os.mkdir(dest)
+
+		with zipfile.ZipFile(ipsw,"r") as z:
+			print("\n[i] decompressing %s..." % ipsw)
+			z.extractall(dest)
+		
