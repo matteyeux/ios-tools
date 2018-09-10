@@ -5,4 +5,6 @@
 *.release.*
 *.dec
 *.pyc
+ipsw
 test
+
