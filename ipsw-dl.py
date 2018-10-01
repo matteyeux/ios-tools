@@ -83,7 +83,7 @@ def usage(toolname):
 if __name__ == '__main__':
 	argv = sys.argv
 	argc = len(argv)
-
+        decompress = False
 	# if you don't specify a version
 	# this tool will download the latest firmware for your device
 	if argc == 2:
@@ -91,7 +91,11 @@ if __name__ == '__main__':
 		version = None
 	elif argc == 3:
 		device = argv[1]
-		version = argv[2]
+                if argv[2] == "-u":
+		    decompress = True
+                    version = None
+                else :
+                    version = argv[2]
 	elif argc == 4:
 		device = argv[1]
 		version = argv[2]
@@ -108,7 +112,7 @@ if __name__ == '__main__':
 	dl(url, ipsw, size_of_ipsw)
 
 	if decompress is True:
-		dest = "ipsw"
+                dest = "ipsw"
 		if os.path.isdir(dest):
 			recursive_rm(dest)
 		else :
