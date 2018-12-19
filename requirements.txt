@@ -1,4 +1,3 @@
-bs4
-mechanize
 clint
 requests
+mechanicalsoup
