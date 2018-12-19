@@ -32,21 +32,43 @@ done
 Python script used to grab iOS Firmware keys on https://www.theiphonewiki.com
 ![demo](screen.png)
 
-`usage: ./scrap.py -c [codename] -d [device] -i [version]`
+```bash
+usage: ./scrapkeys.py [args]
+ -d <device>
+ -i <version>
+ -b <build ID>
+ -c <codename>
+```
 
 You need :
-- **Codename** of the iOS version
+- ~~**Codename** of the iOS version~~
 - **Device** model
 - **iOS** version
 
-eg : `python scrap.py -c Dubois -i 10.2.1 -d iPad4,7` <br>
+eg : `./scrapkeys.py -i 9.0.2 -d iPhone5,4` <br>
 You can use build ID instead of iOS version for betas.
 
 I'm still looking for a way to not use codename, feel free to contribute. 
 
+
+### autodecrypt
+
+autodecrypt.py is a tool to grab keys (by using scrapkeys.py) and decrypt iOS image files.
+
+```
+usage : ./autodecrypt.py -f <img3 file> -i [iOS version] -d [device]
+options : 
+-f [IMG3 file]
+-i |iOS version]
+-b [build version]
+-d [device]
+```
+
+
 ### Dependencies
-- Python [2.7](https://python.org) and pip
-- mechanize
-- BeautifulSoup4
+- Python [3](https://python.org) and pip3
+- MechanicalSoup
+- clint
+- requests
 
 Twitter : [matteyeux](https://twitter.com/matteyeux)
