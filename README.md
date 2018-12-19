@@ -64,6 +64,7 @@ options :
 -d [device]
 ```
 
+![demo2](image.PNG)
 
 ### Dependencies
 - Python [3](https://python.org) and pip3
