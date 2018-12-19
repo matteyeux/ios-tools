@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os
 import shutil
 import requests
 import json
-import urllib2
+from urllib.request import urlopen
 import zipfile
 from clint.textui import progress
 
@@ -12,14 +12,14 @@ from clint.textui import progress
 def get_filename(url):
 	for i in range(len(url)):
 		if url[i] == '/':
-  			position = i + 1
+			position = i + 1
 	return url[position:]
 
 # download file
 def dl(url, filename, sizeofile):
 	# idk the size of the file
 	if sizeofile == 0:
-		dl_file = urllib2.urlopen(url)
+		dl_file = urlopen(url)
 		with open(filename,'wb') as output:
 			output.write(dl_file.read())
 
@@ -83,7 +83,7 @@ def usage(toolname):
 if __name__ == '__main__':
 	argv = sys.argv
 	argc = len(argv)
-        decompress = False
+	decompress = False
 	# if you don't specify a version
 	# this tool will download the latest firmware for your device
 	if argc == 2:
@@ -91,11 +91,11 @@ if __name__ == '__main__':
 		version = None
 	elif argc == 3:
 		device = argv[1]
-                if argv[2] == "-u":
-		    decompress = True
-                    version = None
-                else :
-                    version = argv[2]
+		if argv[2] == "-u":
+			decompress = True
+			version = None
+		else :
+			version = argv[2]
 	elif argc == 4:
 		device = argv[1]
 		version = argv[2]
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 	dl(url, ipsw, size_of_ipsw)
 
 	if decompress is True:
-                dest = "ipsw"
+		dest = "ipsw"
 		if os.path.isdir(dest):
 			recursive_rm(dest)
 		else :
@@ -121,4 +121,3 @@ if __name__ == '__main__':
 		with zipfile.ZipFile(ipsw,"r") as z:
 			print("\n[i] decompressing %s..." % ipsw)
 			z.extractall(dest)
-		
