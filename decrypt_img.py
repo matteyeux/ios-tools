@@ -4,7 +4,6 @@ import os
 import sys
 from struct import Struct
 import subprocess
-#from lzss import decompressor
 
 tag_unpack = Struct('<4s2I').unpack
 kbag_unpack = Struct('<2I16s').unpack
@@ -85,7 +84,12 @@ def decrypt_img(input, output, magic, key, iv, openssl='openssl'):
 
 			print("[w] Nothing was decrypted from %s" % input)
 	elif magic == "img4":
+		print("[x] decrypting %s to %s..." % (input, output))
 		FNULL = open(os.devnull, 'w')
-		p = subprocess.Popen(['img4', '-i', input, output, iv + key], stdout=FNULL)
+		try:
+			p = subprocess.Popen(['img4', '-i', input, output, iv + key], stdout=FNULL)
+		except:
+			print("[e] can't decrypt file, is img4 tool in $PATH ?")
+			sys.exit(1)
 	else:
 		return

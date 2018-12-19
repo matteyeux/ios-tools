@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os
 sys.path.insert(0, ".")
@@ -8,6 +8,7 @@ import scrapkeys
 # boring part of the code.
 # TODO : find a better way
 def get_image_type_name(image):
+	image = image.decode("utf-8")
 	if image == "ogol" or image == "logo":
 		img_type = "applelogo"
 	elif image == "0ghc" or image == "chg0":
@@ -95,7 +96,7 @@ if __name__ == '__main__':
 	image_keys = scrapkeys.parse_iphonewiki(url, image_name)
 	iv = image_keys[:32]
 	key = image_keys[-64:]
-	print("[+] iv : %s" % iv)
+	print("[+] iv  : %s" % iv)
 	print("[+] key : %s" % key)
 	decrypt_img.decrypt_img(file, file + ".dec", magic, key, iv, openssl='openssl')
 	print("[x] done")

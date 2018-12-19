@@ -1,20 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os
-import mechanize
 import json
-import urllib2
-from bs4 import BeautifulSoup
+from urllib.request import urlopen
+import mechanicalsoup
 
 class colors :
 	GREEN = '\033[92m'
 	ENDG = '\033[0m'
 
 def parse_iphonewiki(url2parse, img_type):
-	br = mechanize.Browser()
-	br.set_handle_robots(False)
-	html = br.open(url2parse).read()
-	soup = BeautifulSoup(html, 'html.parser')
+	br = mechanicalsoup.StatefulBrowser()
+	html = br.open(url2parse)
 
 	keypage = list()
 	keypage =   ["rootfs-key", "updateramdisk-iv", "updateramdisk-key",
@@ -33,7 +30,7 @@ def parse_iphonewiki(url2parse, img_type):
 	j = 0
 	key = ""
 	for i in range(0, len(keypage)):
-		for hit in soup.findAll(attrs={'id': "keypage-" + keypage[i]}):
+		for hit in br.get_current_page().find_all(attrs={'id': "keypage-" + keypage[i]}):
 			if img_type == None:
 				bl = keypage[i]
 				print(bl + ":\n\t %s" % hit.text)
@@ -47,7 +44,7 @@ def parse_iphonewiki(url2parse, img_type):
 def version_or_build(model, version, build):
 	get_buildid = False
 	get_version = False
-	json_file = urllib2.urlopen("https://api.ipsw.me/v4/device/" + model)
+	json_file = urlopen("https://api.ipsw.me/v4/device/" + model)
 	with open(model, 'wb') as output:
 		output.write(json_file.read())
 
@@ -81,14 +78,12 @@ def get_codename(device, version, build):
 	version = version.split('.')[0] + ".x"
 	url = "https://www.theiphonewiki.com/wiki/Firmware_Keys/" + version
 
-	br = mechanize.Browser()
-	br.set_handle_robots(False)
-	html = br.open(url).read()
-	soup = BeautifulSoup(html, 'html.parser')
+	br = mechanicalsoup.StatefulBrowser()
+	html = br.open(url) #.read()
 
 	i = 0
 	checker = False
-	data = soup.findAll('a')
+	data = br.get_current_page().find_all('a')
 	device = "(%s)" % device
 
 	for hit in data:
