@@ -50,22 +50,6 @@ You can use build ID instead of iOS version for betas.
 
 I'm still looking for a way to not use codename, feel free to contribute. 
 
-
-### autodecrypt
-
-autodecrypt.py is a tool to grab keys (by using scrapkeys.py) and decrypt iOS image files.
-
-```
-usage : ./autodecrypt.py -f <img3 file> -i [iOS version] -d [device]
-options : 
--f [IMG3 file]
--i |iOS version]
--b [build version]
--d [device]
-```
-
-![demo2](image.PNG)
-
 ### Dependencies
 - Python [3](https://python.org) and pip3
 - MechanicalSoup
