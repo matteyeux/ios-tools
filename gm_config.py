@@ -7,10 +7,13 @@ import re
 import requests
 from pyquery import PyQuery
 
+wiki = "https://www.theiphonewiki.com"
+
 
 # eg iPhone9,3
 def get_json_data(model):
     url = "https://api.ipsw.me/v4/device/" + model
+    print("url : %s" % url)
     resp = requests.get(url=url)
     return resp.json()
 
@@ -37,25 +40,24 @@ def get_build_list(json_data):
 
 
 def getFirmwareKeysPage(device, buildnum):
-    wiki = "https://www.theiphonewiki.com"
     r = requests.get(wiki+"/w/index.php", params={'search': buildnum+" "+device})
     html = r.text
     link = re.search("\/wiki\/.*_"+buildnum+"_\("+device+"\)",html)
     try:
         pagelink = wiki+link.group()
+        return pagelink
     except:
         return None
-    return pagelink
 
 
 def getkeys(json_data, device, buildnum):
     rsp = {}
+    oldname = None
     pagelink = getFirmwareKeysPage(device, buildnum)
     if pagelink is None:
         return None
 
-    r = requests.get(pagelink)
-    html = r.text
+    html = requests.get(pagelink).text
     rsp["build"] = buildnum
     rsp["device"] = device
     rsp["download"] = get_firmware_url(json_data, buildnum)
@@ -63,16 +65,19 @@ def getkeys(json_data, device, buildnum):
     pq = PyQuery(html)
     images = {}
     for span in pq.items('span.mw-headline'):
-        key = {}
         name = span.text()
 
         if name.lower() == "sep-firmware":
             name = "sepfirmware"
 
         fname = span.parent().next("* > span.keypage-filename").text()
-        
+
+        name = name.lower().split('\xa0')[0]
+        if oldname == name:
+            name += "2"
+
         iv = span.parent().siblings("*>*>code#keypage-"+name.lower()+"-iv").text()
-        key_ = span.parent().siblings("*>*>code#keypage-"+name.lower()+"-key").text()
+        key = span.parent().siblings("*>*>code#keypage-"+name.lower()+"-key").text()
  
         if "iBEC" in fname or "iBSS" in fname:
             fname_path = "Firmware/dfu/" + fname
@@ -80,8 +85,8 @@ def getkeys(json_data, device, buildnum):
             fname_path = "Firmware/all_flash/" + fname
 
         if iv != "" and "Unknown" not in iv:
-            images[fname_path] = iv + key_
-
+            images[fname_path] = iv + key
+        oldname = name
     rsp["images"] = images
     rsp["ios_vers"] = get_ios_vers(json_data, buildnum)
     return json.dumps(rsp, indent=4)
@@ -136,7 +141,6 @@ if __name__ == "__main__":
             keys = getkeys(json_data, sys.argv[1], build_list[i])
 
         if keys is not None:
-            print("keys not none")
             config_dir = setup_gm_config(sys.argv[1], build_list[i])
             create_gm_config_file(config_dir, keys)
             print(keys)
