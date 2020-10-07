@@ -19,7 +19,7 @@ def main():
 
         try:
             print(iboot_version.decode('utf-8'))
-        except:
+        except UnicodeDecodeError:
             print(f"{sys.argv[1]} does not seem decrypted or is not supported")
             return -1
 
